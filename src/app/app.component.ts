@@ -10,6 +10,7 @@ export class AppComponent implements OnInit {
   data: any[] = [];
   page = 1;
   pageSize = 5;
+  columnOrder = new Map<string, boolean>();
 
   constructor(private cd: ChangeDetectorRef) {}
 
@@ -31,6 +32,27 @@ export class AppComponent implements OnInit {
 
   toggleRow(row: any) {
     row.isExpanded = !row.isExpanded;
+  }
+
+  sortColumn(id: string) {
+    if (this.columnOrder.has(id)) {
+      this.columnOrder.set(id, !this.columnOrder.get(id));
+    } else {
+      this.columnOrder.set(id, true);
+    }
+
+    const order = this.columnOrder.get(id) ? 1 : -1;
+
+    this.data.sort((a, b) => {
+      if (a[id] < b[id]) {
+        return order * -1;
+      } else if (a[id] > b[id]) {
+        return order;
+      }
+      return 0;
+    });
+
+    this.cd.markForCheck();
   }
 
   fetch(cb) {
